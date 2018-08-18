@@ -63,11 +63,6 @@ echo "--- Updating and installing software ---"
 echo
 
 DEBIAN_FRONTEND=noninteractive
-#export LANGUAGE=en_US.UTF-8
-#export LANG=en_US.UTF-8
-#export LC_ALL=en_US.UTF-8
-#locale-gen --purge en_US.UTF-8
-#echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US.UTF-8"\nLC_ALL="en_US.UTF-8"' > /etc/default/locale
 
 # AppArmor
 if [[ -e "~/ranapparmorsetup" ]]; then
@@ -98,6 +93,12 @@ else
        fi
 fi
 
+#export LANGUAGE=en_US.UTF-8
+#export LANG=en_US.UTF-8
+#export LC_ALL=en_US.UTF-8
+#locale-gen --purge en_US.UTF-8
+#echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US.UTF-8"\nLC_ALL="en_US.UTF-8"' > /etc/default/locale
+
 echo "deb http://ftp.debian.org/debian stretch-backports main
 deb-src http://ftp.debian.org/debian stretch-backports main
 deb http://security.debian.org/debian-security jessie/updates main
@@ -109,7 +110,7 @@ echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
 echo strongswan-starter strongswan/runlevel_changes note | debconf-set-selections
 
-apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils python3-pip golang-go make
+apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make
 apt-get install certbot -t stretch-backports -y
 pip3 install certbot-dns-cloudflare
 
