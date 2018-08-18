@@ -692,7 +692,7 @@ A bash script to set up strongSwan as a VPN client is attached as vpn-ubuntu-cli
 
 EOF
 
-cd /etc/letsencrypt/live/$VPNHOST/
+cd /etc/letsencrypt/archive/$VPNHOST/
 openssl smime \
 -sign \
 -signer cert1.pem \
