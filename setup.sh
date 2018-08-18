@@ -296,7 +296,8 @@ echo
 echo "--- Configuring CloudFlare DDNS ---"
 echo
 
-cat <<EOF > /usr/bin/cfupdater-v4 
+touch /var/log/cfupdater.log
+cat <<EOF > /usr/bin/cfupdater-v4
 #!/bin/bash
 
 # Forked by benkulbertis/cloudflare-update-record.sh
