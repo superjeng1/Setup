@@ -47,13 +47,17 @@ echo
 [[ $(id -u) -eq 0 ]] || exit_badly "Please re-run as root (e.g. sudo ./path/to/this/script)"
 
 # Pick up and continue with BBR installation
-if [[ -e "~/raninstallbbr" ]]; then
-       wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
-       bash BBR_POWERED.sh
-       rm ~/raninstallbbr
-       read -p -s "All setup is completed, press [Return] to reboot, or Ctrl-C to exit..."
-       reboot
-       exit 0
+if [[ $(lsmod |grep 'bbr') ]]; then
+  if [[ -z "$(lsmod |grep 'bbr_powered')" ]]; then
+    wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
+    bash BBR_POWERED.sh
+    rm ~/raninstallbbr
+    read -p -s "All setup is completed, press [Return] to reboot, or Ctrl-C to exit..."
+    reboot
+    exit 0
+  else
+    echo "BBR installation is already finished before!!"
+  fi
 fi
 
 echo
@@ -63,33 +67,18 @@ echo
 DEBIAN_FRONTEND=noninteractive
 
 # AppArmor
-if [[ -e "~/ranapparmorsetup" ]]; then
-       rm ~/ranapparmorsetup
-else
-       touch ~/ranapparmorsetup
-       echo
-       echo "AppArmor Setup"
-       echo
-       read -p "Setup AppArmor? Reboot REQUIRED. (y/N): " appArmor
-       echo
-       if [[ "$appArmor" == "y" ]]; then
-              read -p "Will REBOOT after AppArmor setup finished, continue? (y/N): " appArmor2
-              echo
-       else
-              appArmor2="N"
-       fi
-       if [[ "$appArmor2" == "y" ]]; then
-              echo
-              echo
-              echo "Please RErun this script without setting up AppArmor after rebooting to continue with the rest of the setup."
-              read -n 1 -s -r -p "Press any key to continue, or Ctrl-C to abort..."
-              apt-get -o Acquire::ForceIPv4=true update
-              apt-get install -y apparmor apparmor-utils
-              mkdir -p /etc/default/grub.d
-              echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT apparmor=1 security=apparmor"' | tee /etc/default/grub.d/apparmor.cfg
-              update-grub
-              reboot
-       fi
+if [![hash aa-status 2>/dev/null]]; then
+  echo
+  echo "AppArmor Setup"
+  echo
+  echo "Please RE-Run this script without setting up AppArmor after rebooting to continue with the rest of the setup."
+  read -n 1 -s -r -p "Press any key to continue, or Ctrl-C to abort..."
+  apt-get -o Acquire::ForceIPv4=true update
+  apt-get install -y apparmor apparmor-utils
+  mkdir -p /etc/default/grub.d
+  echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT apparmor=1 security=apparmor"' | tee /etc/default/grub.d/apparmor.cfg
+  update-grub
+  reboot
 fi
 
 #export LANGUAGE=en_US.UTF-8
@@ -302,6 +291,7 @@ aa-status --enabled && invoke-rc.d apparmor reload
 echo
 echo "--- Configuring timezone ---"
 echo
+date
 ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime
 dpkg-reconfigure -f noninteractive tzdata
 
