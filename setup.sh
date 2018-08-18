@@ -52,7 +52,7 @@ if [[ $(lsmod |grep 'bbr') ]]; then
     wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
     bash BBR_POWERED.sh
     rm ~/raninstallbbr
-    read -p -s "All setup is completed, press [Return] to reboot, or Ctrl-C to exit..."
+    read -s -p "All setup is completed, press [Return] to reboot, or Ctrl-C to exit..."
     reboot
     exit 0
   else
@@ -122,7 +122,7 @@ echo "External IP: ${IP}"
 if [[ "$IP" != "$VPNHOSTIP" ]]; then
   echo "Warning: $VPNHOST resolves to $VPNHOSTIP, not $IP"
   echo "Either you are behind NAT, or something is wrong (e.g. hostname points to wrong IP, CloudFlare proxying shenanigans, ...)"
-  read -p -s "Press [Return] to continue, or Ctrl-C to abort" DUMMYVAR
+  read -s -p "Press [Return] to continue, or Ctrl-C to abort" DUMMYVAR
 fi
 
 echo
@@ -718,7 +718,7 @@ echo "--- How to connect ---"
 echo
 echo "Connection instructions can be found in your home directory"
 
-read -p -s "Setup is almost finished. Press [Return] to Install BBR now and Reboot. Ctrl-C to finish setup without installing BBR..." DUMMYVAR
+read -s -p "Setup is almost finished. Press [Return] to Install BBR now and Reboot. Ctrl-C to finish setup without installing BBR..." DUMMYVAR
 read -n 1 -s -r -p "Please RE-RUN this script after reboot. It will automaticly finish the installation. Press any key to continue..."
 touch ~/raninstallbbr
 wget -qO 'BBR.sh' 'https://moeclub.org/attachment/LinuxShell/BBR.sh'
