@@ -67,7 +67,7 @@ echo
 DEBIAN_FRONTEND=noninteractive
 
 # AppArmor
-if [![hash aa-status 2>/dev/null]]; then
+if ! [ -x "$(command -v aa-status)" ]; then
   echo
   echo "AppArmor Setup"
   echo
@@ -96,7 +96,7 @@ apt-get -o Acquire::ForceIPv4=true update && apt-get upgrade -y
 
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-echo strongswan-starter strongswan/runlevel_changes note | debconf-set-selections
+echo strongswan-starter strongswan/runlevel_changes select Ok | debconf-set-selections
 
 apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make
 apt-get install certbot -t stretch-backports -y
