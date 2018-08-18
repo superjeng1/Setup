@@ -48,7 +48,7 @@ echo
 
 # Pick up and continue with BBR installation
 if [[ $(lsmod |grep 'bbr') ]]; then
-  if [[ -z "$(lsmod |grep 'bbr_powered')" ]]; then
+  if [[ ! $(lsmod |grep 'bbr_powered') ]]; then
     wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
     bash BBR_POWERED.sh
     rm ~/raninstallbbr
