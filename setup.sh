@@ -63,43 +63,47 @@ echo "--- Updating and installing software ---"
 echo
 
 DEBIAN_FRONTEND=noninteractive
-export LANGUAGE=en_US.UTF-8
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-locale-gen --purge en_US.UTF-8
-echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US.UTF-8"\nLC_ALL="en_US.UTF-8"' > /etc/default/locale
-
-echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
-apt-get -o Acquire::ForceIPv4=true update && apt-get upgrade -y
+#export LANGUAGE=en_US.UTF-8
+#export LANG=en_US.UTF-8
+#export LC_ALL=en_US.UTF-8
+#locale-gen --purge en_US.UTF-8
+#echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US.UTF-8"\nLC_ALL="en_US.UTF-8"' > /etc/default/locale
 
 # AppArmor
-if [[ ! -e "~/ranapparmorsetup" ]]; then
-touch ~/ranapparmorsetup
-echo
-echo "AppArmor Setup"
-echo
-read -p "Setup AppArmor? Reboot REQUIRED. (y/N): " appArmor
-echo
-if [[ "$appArmor" == "y" ]]; then
-read -p "Will REBOOT after AppArmor setup finished, continue? (y/N): " appArmor2
-echo
+if [[ -e "~/ranapparmorsetup" ]]; then
+       rm ~/ranapparmorsetup
 else
-appArmor2="N"
+       touch ~/ranapparmorsetup
+       echo
+       echo "AppArmor Setup"
+       echo
+       read -p "Setup AppArmor? Reboot REQUIRED. (y/N): " appArmor
+       echo
+       if [[ "$appArmor" == "y" ]]; then
+              read -p "Will REBOOT after AppArmor setup finished, continue? (y/N): " appArmor2
+              echo
+       else
+              appArmor2="N"
+       fi
+       if [[ "$appArmor2" == "y" ]]; then
+              echo
+              echo
+              echo "Please RErun this script without setting up AppArmor after rebooting to continue with the rest of the setup."
+              read -n 1 -s -r -p "Press any key to continue, or Ctrl-C to abort..."
+              apt-get install -y apparmor apparmor-utils
+              mkdir -p /etc/default/grub.d
+              echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT apparmor=1 security=apparmor"' | tee /etc/default/grub.d/apparmor.cfg
+              update-grub
+              reboot
+       fi
 fi
-if [[ "$appArmor2" == "y" ]]; then
-echo
-echo
-echo "Please RErun this script without setting up AppArmor after rebooting to continue with the rest of the setup."
-read -n 1 -s -r -p "Press any key to continue, or Ctrl-C to abort..."
-apt-get install -y apparmor apparmor-utils
-mkdir -p /etc/default/grub.d
-echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT apparmor=1 security=apparmor"' | tee /etc/default/grub.d/apparmor.cfg
-update-grub
-reboot
-fi
-else
-rm ~/ranapparmorsetup
-fi
+
+echo "deb http://ftp.debian.org/debian stretch-backports main
+deb-src http://ftp.debian.org/debian stretch-backports main
+deb http://security.debian.org/debian-security jessie/updates main
+deb-src http://security.debian.org/debian-security jessie/updates main
+" >> /etc/apt/sources.list
+apt-get -o Acquire::ForceIPv4=true update && apt-get upgrade -y
 
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
