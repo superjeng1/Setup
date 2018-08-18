@@ -2,6 +2,12 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
+if [[ -e "~/raninstallbbr" ]]; then
+       wget --no-check-certificate -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh' && chmod a+x BBR_POWERED.sh && bash BBR_POWERED.sh
+       exit 0
+fi
+
+
 timezone="Asia/Taipei"    # << Change This
 
 email=" "                 # << Change This
@@ -708,9 +714,10 @@ echo "--- How to connect ---"
 echo
 echo "Connection instructions have been emailed to you, and can also be found in your home directory, /home/${LOGINUSERNAME}"
 
-echo "Install FINISHED. Reboot?"
-read -n 1 -s -r -p "Press any key to REBOOT, or Ctrl-C to abort..."
-reboot
+echo "Install FINISHED. Install BBR now and Reboot?"
+read -n 1 -s -r -p "Press any key to install BBR and REBOOT, or Ctrl-C to abort..."
+touch ~/raninstallbbr
+wget --no-check-certificate -qO 'BBR.sh' 'https://moeclub.org/attachment/LinuxShell/BBR.sh' && chmod a+x BBR.sh && bash BBR.sh -f
 
 #echo
 #echo "Shadowsocks installation started"
