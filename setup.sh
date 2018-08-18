@@ -10,6 +10,9 @@ VPNHOST=" "               # << Change This
 
 VPNUSERNAME=" "           # << Change This
 
+cloudflareSecrets="~/.secrets/certbot/cloudflare.ini" # << Maybe Change This
+cloudflareSecretsPath="~/.secrets/certbot/"           # << Maybe Change This
+
 VPNIPPOOL="10.10.10.0/24" # << Maybe Change This
 while true; do
 VPNPASSWORD=" "           # << Change This
@@ -244,13 +247,14 @@ echo
 echo "--- Configuring RSA certificates ---"
 echo
 
-cat <<EOF >> ~/.secrets/certbot/cloudflare.ini
+mkdir -p ${cloudflareSecretsPath}
+cat <<EOF > ${cloudflareSecrets}
 # Cloudflare API credentials used by Certbot
 # Readme: https://certbot-dns-cloudflare.readthedocs.io/en/latest/
 dns_cloudflare_email = ${auth_email}
 dns_cloudflare_api_key = ${auth_key}
 EOF
-chmod 700 ~/.secrets/certbot/cloudflare.ini
+chmod 700 ${cloudflareSecrets}
 
 mkdir -p /etc/letsencrypt
 
@@ -261,7 +265,7 @@ renew-hook = /usr/sbin/ipsec reload && /usr/sbin/ipsec secrets
 ' > /etc/letsencrypt/cli.ini
 
 # certbot certonly --non-interactive --agree-tos --standalone --preferred-challenges http --email ${email} -d $VPNHOST
-certbot certonly --non-interactive --agree-tos -m ${email} --dns-cloudflare --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini --dns-cloudflare-propagation-seconds 60 -d $VPNHOST
+certbot certonly --non-interactive --agree-tos -m ${email} --dns-cloudflare --dns-cloudflare-credentials ${cloudflareSecrets} --dns-cloudflare-propagation-seconds 60 -d $VPNHOST
 
 ln -f -s /etc/letsencrypt/live/$VPNHOST/cert.pem    /etc/ipsec.d/certs/cert.pem
 ln -f -s /etc/letsencrypt/live/$VPNHOST/privkey.pem /etc/ipsec.d/private/privkey.pem
@@ -397,9 +401,9 @@ cat <<'EOF' >> /lib/systemd/system/timers.target
 Requires=systemd-timesyncd-wait.service
 EOF
 
-systemctl daemon-reload
+#systemctl daemon-reload
 systemctl enable cfupdate.timer
-systemctl start cfupdate.timer
+#systemctl start cfupdate.timer
 systemctl status cfupdate.timer
 
 
