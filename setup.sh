@@ -397,6 +397,7 @@ cat <<'EOF' >> /lib/systemd/system/timers.target
 Requires=systemd-timesyncd-wait.service
 EOF
 
+systemctl daemon-reload
 systemctl enable cfupdate.timer
 systemctl start cfupdate.timer
 systemctl status cfupdate.timer
