@@ -708,6 +708,9 @@ echo "--- How to connect ---"
 echo
 echo "Connection instructions have been emailed to you, and can also be found in your home directory, /home/${LOGINUSERNAME}"
 
+echo "Install FINISHED. Reboot?"
+read -n 1 -s -r -p "Press any key to REBOOT, or Ctrl-C to abort..."
+
 #echo
 #echo "Shadowsocks installation started"
 #echo
