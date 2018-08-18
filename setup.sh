@@ -57,6 +57,7 @@ if [[ $(lsmod |grep 'bbr') ]]; then
     exit 0
   else
     echo "BBR installation is already finished before!!"
+    exit 0
   fi
 fi
 
