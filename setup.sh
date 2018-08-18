@@ -6,6 +6,8 @@ if [[ -e "~/raninstallbbr" ]]; then
        wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
        bash BBR_POWERED.sh
        rm ~/raninstallbbr
+       read -p -s "All setup is completed, press [Return] to reboot, or Ctrl-C to exit..."
+       reboot
        exit 0
 fi
 
