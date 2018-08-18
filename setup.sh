@@ -3,7 +3,9 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
 if [[ -e "~/raninstallbbr" ]]; then
-       wget --no-check-certificate -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh' && chmod a+x BBR_POWERED.sh && bash BBR_POWERED.sh
+       wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
+       bash BBR_POWERED.sh
+       rm ~/raninstallbbr
        exit 0
 fi
 
@@ -69,7 +71,10 @@ echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sourc
 apt-get -o Acquire::ForceIPv4=true update && apt-get upgrade -y
 
 # AppArmor
+if [[ ! -e "~/ranapparmorsetup" ]]; then
+touch ~/ranapparmorsetup
 echo
+echo "AppArmor Setup"
 echo
 read -p "Setup AppArmor? Reboot REQUIRED. (y/N): " appArmor
 echo
@@ -90,7 +95,9 @@ echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT apparmor=1 securit
 update-grub
 reboot
 fi
-
+else
+rm ~/ranapparmorsetup
+fi
 
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
@@ -119,7 +126,7 @@ echo "External IP: ${IP}"
 if [[ "$IP" != "$VPNHOSTIP" ]]; then
   echo "Warning: $VPNHOST resolves to $VPNHOSTIP, not $IP"
   echo "Either you are behind NAT, or something is wrong (e.g. hostname points to wrong IP, CloudFlare proxying shenanigans, ...)"
-  read -p "Press [Return] to continue, or Ctrl-C to abort" DUMMYVAR
+  read -p -s "Press [Return] to continue, or Ctrl-C to abort" DUMMYVAR
 fi
 
 echo
@@ -714,10 +721,11 @@ echo "--- How to connect ---"
 echo
 echo "Connection instructions have been emailed to you, and can also be found in your home directory, /home/${LOGINUSERNAME}"
 
-echo "Install FINISHED. Install BBR now and Reboot?"
-read -n 1 -s -r -p "Press any key to install BBR and REBOOT, or Ctrl-C to abort..."
+read -p -s "Install FINISHED. Press [Return] to Install BBR now and Reboot." DUMMYVAR
+read -n 1 -s -r -p "Please RE-RUN this script after reboot. It will automaticly finish the installation. Press any key to continue..."
 touch ~/raninstallbbr
-wget --no-check-certificate -qO 'BBR.sh' 'https://moeclub.org/attachment/LinuxShell/BBR.sh' && chmod a+x BBR.sh && bash BBR.sh -f
+wget -qO 'BBR.sh' 'https://moeclub.org/attachment/LinuxShell/BBR.sh'
+bash BBR.sh -f
 
 #echo
 #echo "Shadowsocks installation started"
