@@ -186,13 +186,13 @@ iptables -t mangle -A PREROUTING -s 240.0.0.0/5 -j DROP
 iptables -t mangle -A PREROUTING -s 127.0.0.0/8 ! -i lo -j DROP
 
 # Security
-### SSH brute-force protection ### 
-iptables -A INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --set 
-iptables -A INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 10 -j DROP  
+### SSH brute-force protection ###
+iptables -A INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --set
+iptables -A INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 10 -j DROP
 
-### Protection against port scanning ### 
-iptables -N port-scanning 
-iptables -A port-scanning -p tcp --tcp-flags SYN,ACK,FIN,RST RST -m limit --limit 1/s --limit-burst 2 -j RETURN 
+### Protection against port scanning ###
+iptables -N port-scanning
+iptables -A port-scanning -p tcp --tcp-flags SYN,ACK,FIN,RST RST -m limit --limit 1/s --limit-burst 2 -j RETURN
 iptables -A port-scanning -j DROP
 
 
@@ -710,6 +710,7 @@ echo "Connection instructions have been emailed to you, and can also be found in
 
 echo "Install FINISHED. Reboot?"
 read -n 1 -s -r -p "Press any key to REBOOT, or Ctrl-C to abort..."
+reboot
 
 #echo
 #echo "Shadowsocks installation started"
