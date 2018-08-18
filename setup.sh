@@ -32,7 +32,7 @@ auth_key="fooAPIKey"           # << Change This
 zone_identifier="fooZoneId"    # << Change This
 # Can be found in the "Overview" tab of your domain
 
-record_name="ipv4.example.org" # << Change This
+record_name=${VPNHOST}
 # Which record you want to be synced
 
 
