@@ -20,7 +20,7 @@ echo
 VPNPASSWORD2=" "          # << Change This
 echo
 [ "$VPNPASSWORD" = "$VPNPASSWORD2" ] && break
-echo "Passwords didn't match -- please try again"
+echo "Passwords didn't match -- please edit VPNPASSWORD and VPNPASSWORD2 in this script so they match."
 done
 
 auth_email="foo@example.org"   # << Change This
