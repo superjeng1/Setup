@@ -2,16 +2,6 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
-if [[ -e "~/raninstallbbr" ]]; then
-       wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
-       bash BBR_POWERED.sh
-       rm ~/raninstallbbr
-       read -p -s "All setup is completed, press [Return] to reboot, or Ctrl-C to exit..."
-       reboot
-       exit 0
-fi
-
-
 timezone="Asia/Taipei"    # << Change This
 
 email=" "                 # << Change This
@@ -42,21 +32,29 @@ auth_key="fooAPIKey"           # << Change This
 zone_identifier="fooZoneId"    # << Change This
 # Can be found in the "Overview" tab of your domain
 
-record_name=${VPNHOST}
+record_name=${VPNHOST}         # << Linked with VPNHOST
 # Which record you want to be synced
-
-
-echo
-echo "=== Script Start ==="
-echo
 
 function exit_badly {
   echo $1
   exit 1
 }
 
+echo
+echo "=== Script Start ==="
+echo
 
 [[ $(id -u) -eq 0 ]] || exit_badly "Please re-run as root (e.g. sudo ./path/to/this/script)"
+
+# Pick up and continue with BBR installation
+if [[ -e "~/raninstallbbr" ]]; then
+       wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
+       bash BBR_POWERED.sh
+       rm ~/raninstallbbr
+       read -p -s "All setup is completed, press [Return] to reboot, or Ctrl-C to exit..."
+       reboot
+       exit 0
+fi
 
 echo
 echo "--- Updating and installing software ---"
@@ -85,6 +83,7 @@ else
               echo
               echo "Please RErun this script without setting up AppArmor after rebooting to continue with the rest of the setup."
               read -n 1 -s -r -p "Press any key to continue, or Ctrl-C to abort..."
+              apt-get -o Acquire::ForceIPv4=true update
               apt-get install -y apparmor apparmor-utils
               mkdir -p /etc/default/grub.d
               echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT apparmor=1 security=apparmor"' | tee /etc/default/grub.d/apparmor.cfg
