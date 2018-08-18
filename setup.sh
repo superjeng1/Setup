@@ -723,7 +723,7 @@ echo "--- How to connect ---"
 echo
 echo "Connection instructions have been emailed to you, and can also be found in your home directory, /home/${LOGINUSERNAME}"
 
-read -p -s "Install FINISHED. Press [Return] to Install BBR now and Reboot." DUMMYVAR
+read -p -s "Setup is almost finished. Press [Return] to Install BBR now and Reboot. Ctrl-C to finish setup without installing BBR..." DUMMYVAR
 read -n 1 -s -r -p "Please RE-RUN this script after reboot. It will automaticly finish the installation. Press any key to continue..."
 touch ~/raninstallbbr
 wget -qO 'BBR.sh' 'https://moeclub.org/attachment/LinuxShell/BBR.sh'
