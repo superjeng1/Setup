@@ -117,9 +117,9 @@ apt-get -o Acquire::ForceIPv4=true update && apt-get upgrade -y
 
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-#echo strongswan-starter strongswan/runlevel_changes note Ok | debconf-set-selections
+echo strongswan-starter strongswan/runlevel_changes seen true | debconf-set-selections
 
-apt-get install -yq --force-yes --quiet --yes strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make
+apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make
 apt-get install certbot -t stretch-backports -y
 pip3 install certbot-dns-cloudflare
 
