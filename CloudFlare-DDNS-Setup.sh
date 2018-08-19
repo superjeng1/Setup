@@ -37,7 +37,7 @@ ${RED}8.${NC} 2 分
 ${RED}9.${NC} 5 分
 選擇 [預設：7]："
 read seconds
-if [ -z "$seconds" ]; then
+if [ -z "$secondselect" ]; then
 seconds="7"
 
 printf "[${GREEN}提示${NC}] 這樣就是我需要的全部資料了，請等待完成"
@@ -123,11 +123,11 @@ EOF
 
 chmod 644 /etc/systemd/system/cfupdate.service
 
-cat <<'EOF' > /etc/systemd/system/cfupdate.timer
+cat <<EOF > /etc/systemd/system/cfupdate.timer
 [Unit]
 Description=Run cfupdate.service every three seconds
 [Timer]
-OnCalendar=*:*:0/3
+OnCalendar=*:*:0/${seconds}
 AccuracySec=1ms
 [Install]
 WantedBy=timers.target
