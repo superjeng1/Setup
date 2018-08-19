@@ -2,6 +2,8 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
+allVaribles="timezone email VPNHOST VPNUSERNAME cloudflareSecrets cloudflareSecretsPath VPNIPPOOL VPNPASSWORD VPNPASSWORD2 auth_email auth_key zone_identifier record_name"
+
 timezone="Asia/Taipei"    # << Change This
 
 email=" "                 # << Change This
@@ -46,6 +48,25 @@ echo
 
 [[ $(id -u) -eq 0 ]] || exit_badly "Please re-run as root (e.g. sudo ./path/to/this/script)"
 
+echo
+echo "=== Checking for varibles ==="
+echo
+for varibleName in $allVaribles
+do
+  if [[ "${!varibleName}" = " " ]]; then
+    exit_badly "Varible '$varibleName' does not exists. Please enter it by editing this script!!"
+  fi
+done
+if [[ $auth_email = "foo@example.org" ]]; then
+  exit_badly "Varible 'auth_email' is still a default value. Please enter it by editing this script!!"
+fi
+if [[ $auth_key = "fooAPIKey" ]]; then
+  exit_badly "Varible 'auth_key' is still a default value. Please enter it by editing this script!!"
+fi
+if [[ $zone_identifier="fooZoneId" ]]; then
+  exit_badly "Varible 'zone_identifier' is still a default value. Please enter it by editing this script!!"
+fi
+
 # Pick up and continue with BBR installation
 if [[ $(lsmod |grep 'bbr') ]]; then
   if [[ ! $(lsmod |grep 'bbr_powered') ]]; then
@@ -56,8 +77,7 @@ if [[ $(lsmod |grep 'bbr') ]]; then
     reboot
     exit 0
   else
-    echo "BBR installation is already finished before!!"
-    exit 0
+    exit_badly "BBR installation is already finished before!!"
   fi
 fi
 
