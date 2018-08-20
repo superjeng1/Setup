@@ -85,20 +85,6 @@ case "$secondselect" in
   ;;
 esac
 
-printf "[${GREEN}${bold}選擇${NC}${normal}] 是否顯示命令輸出？（Debug 用，無需求可關閉）
-${RED}${bold}0.${NC}${normal} 關
-${RED}${bold}1.${NC}${normal} 開
-選擇 [預設：0]："
-read debugselect
-if [ -z "$debugselect" ]; then
-debugselect="0"
-fi
-if [ debugselect = "0" ]; then
-debug=""
-else
-debug="&> /dev/null"
-fi
-
 printf "[${GREEN}${bold}提示${NC}${normal}] 這樣就是我需要的全部資料了，請等待完成\n"
 printf "[${GREEN}${bold}配置${NC}${normal}] 開始安裝依賴\n"
 apt-get update &> /dev/null
