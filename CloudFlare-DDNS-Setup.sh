@@ -2,6 +2,13 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
+function exit_badly {
+  echo $1
+  exit 1
+}
+
+[[ $(id -u) -eq 0 ]] || exit_badly "Please re-run as root (e.g. sudo ./path/to/this/script)"
+
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 GREEN='\033[0;32m'
