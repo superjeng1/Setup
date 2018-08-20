@@ -176,12 +176,12 @@ chmod 644 /etc/systemd/system/cfupdate.timer
 
 mkdir ~/systemd-timesyncd-wait/
 cd ~/systemd-timesyncd-wait/
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/Makefile
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.go
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.service
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.socket
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wrap.go
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd.service.d-wait.conf
+curl -O https://github.com/assisi/systemd-timesyncd-wait/raw/master/Makefile
+curl -O https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.go
+curl -O https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.service
+curl -O https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.socket
+curl -O https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wrap.go
+curl -O https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd.service.d-wait.conf
 make
 make install
 cd ~/
