@@ -82,18 +82,32 @@ case "$secondselect" in
   ;;
 esac
 
+printf "[${GREEN}選擇${NC}] 是否顯示命令輸出？（Debug 用，無需求可關閉）
+${RED}0.${NC} 關
+${RED}1.${NC} 開
+選擇 [預設：0]："
+read debugselect
+if [ -z "$debugselect" ]; then
+debugselect="0"
+fi
+if [ debugselect = "0" ]; then
+debug=""
+else
+debug="&> /dev/null"
+fi
+
 printf "[${GREEN}提示${NC}] 這樣就是我需要的全部資料了，請等待完成\n"
 printf "[${GREEN}配置${NC}] 開始安裝依賴\n"
-apt-get update &> /dev/null
-apt-get install -y ca-certificates golang-go make grep curl &> /dev/null
+apt-get update ${debug}
+apt-get install -y ca-certificates golang-go make grep curl ${debug}
 printf "[${GREEN}完成${NC}] 安裝依賴完成\n"
 printf "[${GREEN}配置${NC}] 開始設定時區\n"
-ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime &> /dev/null
-dpkg-reconfigure -f noninteractive tzdata &> /dev/null
+ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime ${debug}
+dpkg-reconfigure -f noninteractive tzdata ${debug}
 printf "[${GREEN}完成${NC}] 時區設定完成\n"
 
 printf "[${GREEN}配置${NC}] 開始設定NTP\n"
-timedatectl set-ntp true &> /dev/null
+timedatectl set-ntp true ${debug}
 cat <<'EOF' >> /etc/systemd/timesyncd.conf
 NTP=time1.google.com time2.google.com time3.google.com time4.google.com
 FallbackNTP=time1.google.com time2.google.com time3.google.com time4.google.com
@@ -176,14 +190,14 @@ chmod 644 /etc/systemd/system/cfupdate.timer
 
 mkdir ~/systemd-timesyncd-wait/
 cd ~/systemd-timesyncd-wait/
-curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/Makefile
-curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.go
-curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.service
-curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.socket
-curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wrap.go
-curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd.service.d-wait.conf
-make
-make install
+curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/Makefile ${debug}
+curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.go ${debug}
+curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.service ${debug}
+curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.socket ${debug}
+curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wrap.go ${debug}
+curl -LJO https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd.service.d-wait.conf ${debug}
+make ${debug}
+make install ${debug}
 cd ~/
 
 cat <<'EOF' >> /lib/systemd/system/timers.target
