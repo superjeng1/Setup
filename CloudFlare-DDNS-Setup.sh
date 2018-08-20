@@ -85,7 +85,7 @@ esac
 printf "[${GREEN}提示${NC}] 這樣就是我需要的全部資料了，請等待完成"
 printf "[${GREEN}配置${NC}] 開始安裝依賴"
 apt-get update &> /dev/null
-apt-get install -y ca-certificates golang-go make grep wget curl &> /dev/null
+apt-get install -y ca-certificates golang-go make grep curl &> /dev/null
 printf "[${GREEN}完成${NC}] 安裝依賴完成"
 printf "[${GREEN}配置${NC}] 開始設定時區"
 ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime &> /dev/null
