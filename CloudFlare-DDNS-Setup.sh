@@ -77,30 +77,30 @@ case "$secondselect" in
   seconds=5
   ;;
 *)
-  printf "[${RED}錯誤${NC}] 選擇錯誤！"
+  printf "[${RED}錯誤${NC}] 選擇錯誤！\n"
   exit 1
   ;;
 esac
 
-printf "[${GREEN}提示${NC}] 這樣就是我需要的全部資料了，請等待完成"
-printf "[${GREEN}配置${NC}] 開始安裝依賴"
+printf "[${GREEN}提示${NC}] 這樣就是我需要的全部資料了，請等待完成\n"
+printf "[${GREEN}配置${NC}] 開始安裝依賴\n"
 apt-get update &> /dev/null
 apt-get install -y ca-certificates golang-go make grep curl &> /dev/null
-printf "[${GREEN}完成${NC}] 安裝依賴完成"
-printf "[${GREEN}配置${NC}] 開始設定時區"
+printf "[${GREEN}完成${NC}] 安裝依賴完成\n"
+printf "[${GREEN}配置${NC}] 開始設定時區\n"
 ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime &> /dev/null
 dpkg-reconfigure -f noninteractive tzdata &> /dev/null
-printf "[${GREEN}完成${NC}] 時區設定完成"
+printf "[${GREEN}完成${NC}] 時區設定完成\n"
 
-printf "[${GREEN}配置${NC}] 開始設定NTP"
+printf "[${GREEN}配置${NC}] 開始設定NTP\n"
 timedatectl set-ntp true &> /dev/null
 cat <<'EOF' >> /etc/systemd/timesyncd.conf
 NTP=time1.google.com time2.google.com time3.google.com time4.google.com
 FallbackNTP=time1.google.com time2.google.com time3.google.com time4.google.com
 EOF
-printf "[${GREEN}完成${NC}] NTP設定完成"
+printf "[${GREEN}完成${NC}] NTP設定完成\n"
 
-printf "[${GREEN}配置${NC}] 開始生成 CloudFlare DDNS 腳本"
+printf "[${GREEN}配置${NC}] 開始生成 CloudFlare DDNS 腳本\n"
 touch /var/log/cfupdater.log
 cat <<EOF > /usr/bin/cfupdater-v4
 #!/bin/bash
@@ -148,8 +148,8 @@ esac
 EOF
 
 chmod 700 /usr/bin/cfupdater-v4
-printf "[${GREEN}完成${NC}] CloudFlare DDNS 腳本生成完成"
-printf "[${GREEN}配置${NC}] 開始配置 Systemd"
+printf "[${GREEN}完成${NC}] CloudFlare DDNS 腳本生成完成\n"
+printf "[${GREEN}配置${NC}] 開始配置 Systemd\n"
 cat <<'EOF' > /etc/systemd/system/cfupdate.service
 [Unit]
 Description=Cloudflare DDNS service
@@ -190,11 +190,11 @@ cat <<'EOF' >> /lib/systemd/system/timers.target
 Requires=systemd-timesyncd-wait.service
 EOF
 systemctl enable cfupdate.timer
-printf "[${GREEN}完成${NC}] Systemd 配置完成"
-printf "[${GREEN}啟動${NC}] 正在啟動 Systemd 計時器"
+printf "[${GREEN}完成${NC}] Systemd 配置完成\n"
+printf "[${GREEN}啟動${NC}] 正在啟動 Systemd 計時器\n"
 #systemctl daemon-reload
 systemctl start cfupdate.timer
 #systemctl status cfupdate.timer
-printf "[${GREEN}提示${NC}] 設置完成，計時器執行紀錄紀錄於 /var/log/cfupdater.log"
-printf "[${GREEN}完成${NC}] 腳本完成"
+printf "[${GREEN}提示${NC}] 設置完成，計時器執行紀錄紀錄於 /var/log/cfupdater.log\n"
+printf "[${GREEN}完成${NC}] 腳本完成\n"
 exit 0
