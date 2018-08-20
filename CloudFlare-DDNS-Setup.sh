@@ -39,6 +39,7 @@ ${RED}9.${NC} 5 分
 read secondselect
 if [ -z "$secondselect" ]; then
 secondselect="7"
+fi
 
 case "$secondselect" in
 "1")
@@ -69,18 +70,16 @@ case "$secondselect" in
   seconds=5
   ;;
 *)
-  printf "[${RED}錯誤${NC}] 選擇錯誤！
+  printf "[${RED}錯誤${NC}] 選擇錯誤！"
   exit 1
   ;;
 esac
 
 printf "[${GREEN}提示${NC}] 這樣就是我需要的全部資料了，請等待完成"
-echo ""
-
-
+printf "[${GREEN}配置${NC}] 開始安裝依賴"
 apt-get update &> /dev/null
 apt-get install -y ca-certificates golang-go make &> /dev/null
-
+printf "[${GREEN}完成${NC}] 安裝依賴完成"
 printf "[${GREEN}配置${NC}] 開始設定時區"
 ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime &> /dev/null
 dpkg-reconfigure -f noninteractive tzdata &> /dev/null
@@ -189,5 +188,6 @@ printf "[${GREEN}啟動${NC}] 正在啟動 Systemd 計時器"
 #systemctl daemon-reload
 systemctl start cfupdate.timer
 #systemctl status cfupdate.timer
+printf "[${GREEN}提示${NC}] 設置完成，計時器執行紀錄紀錄於 /var/log/cfupdater.log"
 printf "[${GREEN}完成${NC}] 腳本完成"
 exit 0
