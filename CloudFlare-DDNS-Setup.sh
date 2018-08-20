@@ -71,13 +71,13 @@ case "$secondselect" in
   seconds=*:0/30
   ;;
 "7")
-  seconds=1
+  seconds=0/1
   ;;
 "8")
-  seconds=2
+  seconds=0/2
   ;;
 "9")
-  seconds=5
+  seconds=0/5
   ;;
 *)
   printf "[${RED}${bold}錯誤${NC}${normal}] 選擇錯誤！\n"
