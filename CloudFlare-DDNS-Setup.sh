@@ -36,9 +36,43 @@ ${RED}7.${NC} 1 分
 ${RED}8.${NC} 2 分
 ${RED}9.${NC} 5 分
 選擇 [預設：7]："
-read seconds
+read secondselect
 if [ -z "$secondselect" ]; then
-seconds="7"
+secondselect="7"
+
+case "$secondselect" in
+"1")
+  seconds=*:0/3
+  ;;
+"2")
+  seconds=*:0/5
+  ;;
+"3")
+  seconds=*:0/10
+  ;;
+"4")
+  seconds=*:0/15
+  ;;
+"5")
+  seconds=*:0/20
+  ;;
+"6")
+  seconds=*:0/30
+  ;;
+"7")
+  seconds=1
+  ;;
+"8")
+  seconds=2
+  ;;
+"9")
+  seconds=5
+  ;;
+*)
+  printf "[${RED}錯誤${NC}] 選擇錯誤！
+  exit 1
+  ;;
+esac
 
 printf "[${GREEN}提示${NC}] 這樣就是我需要的全部資料了，請等待完成"
 echo ""
@@ -125,9 +159,9 @@ chmod 644 /etc/systemd/system/cfupdate.service
 
 cat <<EOF > /etc/systemd/system/cfupdate.timer
 [Unit]
-Description=Run cfupdate.service every three seconds
+Description=Run cfupdate.service when the timer ticks
 [Timer]
-OnCalendar=*:*:0/${seconds}
+OnCalendar=*:${seconds}
 AccuracySec=1ms
 [Install]
 WantedBy=timers.target
