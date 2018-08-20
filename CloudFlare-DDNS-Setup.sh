@@ -23,17 +23,17 @@ function interactive {
   printf "[${GREEN}${bold}輸入${NC}${normal}] 請輸入登入 CloudFlare 的電子郵箱："
   read auth_email
 
-  printf "[${GREEN}${bold}輸入${NC}${normal}] 請前往 CloudFlare 尋找 API Key，方法如下"
-  printf "       登入後請點選右上角的頭像，點選帳號郵箱"
-  printf "       下方有個 Global API Key，對他旁邊的 View 按一下"
-  printf "       跳出密碼視窗，輸入密碼登入。登入完畢後金鑰會出現"
+  printf "[${GREEN}${bold}輸入${NC}${normal}] 請前往 CloudFlare 尋找 API Key，方法如下\n"
+  printf "       登入後請點選右上角的頭像，點選帳號郵箱\n"
+  printf "       下方有個 Global API Key，對他旁邊的 View 按一下\n"
+  printf "       跳出密碼視窗，輸入密碼登入。登入完畢後金鑰會出現\n"
   printf "       把它複製起來，並貼上到這裡："
   read auth_key
 
-  printf "[${GREEN}${bold}輸入${NC}${normal}] 請前往 CloudFlare 尋找 Zone ID，方法如下"
-  printf "       登入後左上位置的選單選HOME，"
-  printf "       選擇想DDNS的網域名，點下去後"
-  printf "       頁面中應該可以看到 Zone ID 點 Copy"
+  printf "[${GREEN}${bold}輸入${NC}${normal}] 請前往 CloudFlare 尋找 Zone ID，方法如下\n"
+  printf "       登入後左上位置的選單選HOME，\n"
+  printf "       選擇想DDNS的網域名，點下去後\n"
+  printf "       頁面中應該可以看到 Zone ID 點 Copy\n"
   printf "       然後貼到這裡："
   read zone_identifier
 
