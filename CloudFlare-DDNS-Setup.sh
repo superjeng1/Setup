@@ -192,7 +192,7 @@ cd ~/
 cat <<'EOF' >> /lib/systemd/system/timers.target
 Requires=systemd-timesyncd-wait.service
 EOF
-systemctl enable cfupdate.timer
+systemctl enable cfupdate.timer &> /dev/null
 printf "[${GREEN}${bold}完成${NC}${normal}] Systemd 配置完成\n"
 printf "[${GREEN}${bold}啟動${NC}${normal}] 正在啟動 Systemd 計時器\n"
 #systemctl daemon-reload
