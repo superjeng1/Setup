@@ -29,8 +29,8 @@ printf "[${GREEN}輸入${NC}] 請前往 CloudFlare 尋找 Zone ID，方法如下
        然後貼到這裡："
 read zone_identifier
 
-printf "[${GREEN}輸入${NC}] 請輸入想 DDNS 的域名全名（如：foo.example.com）
-[${RED}提示${NC}] 請務必先前往 CloudFlare 添加該域名的紀錄，但可隨便指向任意 IP ："
+printf "[${RED}提示${NC}] 請${RED}務必${NC}先前往 CloudFlare 添加想 DDNS 的域名的紀錄，但可隨便指向任意 IP 
+[${GREEN}輸入${NC}] 請輸入想 DDNS 的域名全名（如：foo.example.com）："
 read record_name
 
 printf "[${GREEN}選擇${NC}] 請問更新頻率？（CloudFlare 的 API 要求限制為 1200次/秒，若共用 IP，請選較低的頻率）
