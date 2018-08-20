@@ -22,20 +22,39 @@ function chk_root {
 function interactive {
   printf "[${GREEN}${bold}輸入${NC}${normal}] 請輸入登入 CloudFlare 的電子郵箱："
   read auth_email
-  
-  printf "[${GREEN}${bold}輸入${NC}${normal}] 請前往 CloudFlare 尋找 API Key，方法如下\n       登入後請點選右上角的頭像，點選帳號郵箱\n       下方有個 Global API Key，對他旁邊的 View 按一下\n       跳出密碼視窗，輸入密碼登入。登入完畢後金鑰會出現\n       把它複製起來，並貼上到這裡："
+
+  printf "[${GREEN}${bold}輸入${NC}${normal}] 請前往 CloudFlare 尋找 API Key，方法如下"
+  printf "       登入後請點選右上角的頭像，點選帳號郵箱"
+  printf "       下方有個 Global API Key，對他旁邊的 View 按一下"
+  printf "       跳出密碼視窗，輸入密碼登入。登入完畢後金鑰會出現"
+  printf "       把它複製起來，並貼上到這裡："
   read auth_key
-  
-  printf "[${GREEN}${bold}輸入${NC}${normal}] 請前往 CloudFlare 尋找 Zone ID，方法如下\n       登入後左上位置的選單選HOME，\n       選擇想DDNS的網域名，點下去後\n       頁面中應該可以看到 Zone ID 點 Copy\n       然後貼到這裡："
+
+  printf "[${GREEN}${bold}輸入${NC}${normal}] 請前往 CloudFlare 尋找 Zone ID，方法如下"
+  printf "       登入後左上位置的選單選HOME，"
+  printf "       選擇想DDNS的網域名，點下去後"
+  printf "       頁面中應該可以看到 Zone ID 點 Copy"
+  printf "       然後貼到這裡："
   read zone_identifier
-  
-  printf "[${RED}${bold}提示${NC}${normal}] 請${RED}${bold}務必${NC}${normal}先前往 CloudFlare 添加想 DDNS 的域名的紀錄，但可隨便指向任意 IP \n[${GREEN}${bold}輸入${NC}${normal}] 請輸入想 DDNS 的域名全名（如：foo.example.com）："
+
+  printf "[${RED}${bold}提示${NC}${normal}] 請${RED}${bold}務必${NC}${normal}先前往 CloudFlare 添加想 DDNS 的域名的紀錄，但可隨便指向任意 IP\n"
+  printf "[${GREEN}${bold}輸入${NC}${normal}] 請輸入想 DDNS 的域名全名（如：foo.example.com）："
   read record_name
 
-  printf "[${GREEN}${bold}選擇${NC}${normal}] 請問更新頻率？（CloudFlare 的 API 要求限制為 1200次/秒，若共用 IP，請選較低的頻率）\n${RED}${bold}1.${NC}${normal} 3 秒\n${RED}${bold}2.${NC}${normal} 5 秒\n${RED}${bold}3.${NC}${normal} 10 秒\n${RED}${bold}4.${NC}${normal} 15 秒\n${RED}${bold}5.${NC}${normal} 20 秒\n${RED}${bold}6.${NC}${normal} 30 秒\n${RED}${bold}7.${NC}${normal} 1 分\n${RED}${bold}8.${NC}${normal} 2 分\n${RED}${bold}9.${NC}${normal} 5 分\n選擇 [預設：7]："
+  printf "[${GREEN}${bold}選擇${NC}${normal}] 請問更新頻率？（CloudFlare 的 API 要求限制為 1200次/秒，若共用 IP，請選較低的頻率）\n"
+  printf "${RED}${bold}1.${NC}${normal} 3 秒\n"
+  printf "${RED}${bold}2.${NC}${normal} 5 秒\n"
+  printf "${RED}${bold}3.${NC}${normal} 10 秒\n"
+  printf "${RED}${bold}4.${NC}${normal} 15 秒\n"
+  printf "${RED}${bold}5.${NC}${normal} 20 秒\n"
+  printf "${RED}${bold}6.${NC}${normal} 30 秒\n"
+  printf "${RED}${bold}7.${NC}${normal} 1 分\n"
+  printf "${RED}${bold}8.${NC}${normal} 2 分\n"
+  printf "${RED}${bold}9.${NC}${normal} 5 分\n"
+  printf "選擇 [預設：7]："
   read secondselect
   if [ -z "$secondselect" ]; then
-  secondselect="7"
+    secondselect="7"
   fi
   getSeconds
   printf "[${GREEN}${bold}提示${NC}${normal}] 這樣就是我需要的全部資料了，請等待完成\n"
@@ -77,28 +96,28 @@ function getSeconds {
 }
 
 function install_dependencies {
-printf "[${GREEN}${bold}提示${NC}${normal}] 這樣就是我需要的全部資料了，請等待完成\n"
-printf "[${GREEN}${bold}配置${NC}${normal}] 開始安裝依賴（需要20秒到1分鐘，取決於網速和電腦速度，若之前全裝過則一瞬間完成）\n"
-apt-get update &> /dev/null
-apt-get install -y ca-certificates golang-go make grep curl &> /dev/null
-printf "[${GREEN}${bold}完成${NC}${normal}] 安裝依賴完成\n"
+  printf "[${GREEN}${bold}提示${NC}${normal}] 這樣就是我需要的全部資料了，請等待完成\n"
+  printf "[${GREEN}${bold}配置${NC}${normal}] 開始安裝依賴（需要20秒到1分鐘，取決於網速和電腦速度，若之前全裝過則一瞬間完成）\n"
+  apt-get update &> /dev/null
+  apt-get install -y ca-certificates golang-go make grep curl &> /dev/null
+  printf "[${GREEN}${bold}完成${NC}${normal}] 安裝依賴完成\n"
 }
 
 function set_timezone {
-printf "[${GREEN}${bold}配置${NC}${normal}] 開始設定時區\n"
-ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime &> /dev/null
-dpkg-reconfigure -f noninteractive tzdata &> /dev/null
-printf "[${GREEN}${bold}完成${NC}${normal}] 時區設定完成\n"
+  printf "[${GREEN}${bold}配置${NC}${normal}] 開始設定時區\n"
+  ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime &> /dev/null
+  dpkg-reconfigure -f noninteractive tzdata &> /dev/null
+  printf "[${GREEN}${bold}完成${NC}${normal}] 時區設定完成\n"
 }
 
 function setup_ntp {
-printf "[${GREEN}${bold}配置${NC}${normal}] 開始設定NTP\n"
-timedatectl set-ntp true &> /dev/null
-cat <<'EOF' >> /etc/systemd/timesyncd.conf
+  printf "[${GREEN}${bold}配置${NC}${normal}] 開始設定NTP\n"
+  timedatectl set-ntp true &> /dev/null
+  cat <<'EOF' >> /etc/systemd/timesyncd.conf
 NTP=time1.google.com time2.google.com time3.google.com time4.google.com
 FallbackNTP=time1.google.com time2.google.com time3.google.com time4.google.com
 EOF
-printf "[${GREEN}${bold}完成${NC}${normal}] NTP設定完成\n"
+  printf "[${GREEN}${bold}完成${NC}${normal}] NTP設定完成\n"
 }
 
 function generate_cfupdater_script {
