@@ -23,16 +23,17 @@ printf "[${GREEN}輸入${NC}] 請前往 CloudFlare 尋找 API Key，方法如下
 read auth_key
 
 printf "[${GREEN}輸入${NC}] 請前往 CloudFlare 尋找 Zone ID，方法如下
-       登入後左上位置的選單可以看到自己的網域名，
+       登入後左上位置的選單選HOME，
        選擇想DDNS的網域名，點下去後
        頁面中應該可以看到 Zone ID 點 Copy
        然後貼到這裡："
 read zone_identifier
 
-printf "[${GREEN}輸入${NC}] 請輸入想 DDNS 的域名全名（如：foo.example.com）："
+printf "[${GREEN}輸入${NC}] 請輸入想 DDNS 的域名全名（如：foo.example.com）
+[${RED}提示${NC}] 請務必先前往 CloudFlare 添加該域名的紀錄，但可隨便指向任意 IP ："
 read record_name
 
-printf "[${GREEN}選擇${NC}] 請問更新頻率？（CloudFlare 的 API 要求限制為 1200次/秒，若共用 ip，請選較低的頻率）
+printf "[${GREEN}選擇${NC}] 請問更新頻率？（CloudFlare 的 API 要求限制為 1200次/秒，若共用 IP，請選較低的頻率）
 ${RED}1.${NC} 3 秒
 ${RED}2.${NC} 5 秒
 ${RED}3.${NC} 10 秒
