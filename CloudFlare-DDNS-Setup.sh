@@ -86,7 +86,7 @@ case "$secondselect" in
 esac
 
 printf "[${GREEN}${bold}提示${NC}${normal}] 這樣就是我需要的全部資料了，請等待完成\n"
-printf "[${GREEN}${bold}配置${NC}${normal}] 開始安裝依賴（需要20秒到1分鐘，取決於網速和電腦速度）\n"
+printf "[${GREEN}${bold}配置${NC}${normal}] 開始安裝依賴（需要20秒到1分鐘，取決於網速和電腦速度，若之前全裝過則一瞬間完成）\n"
 apt-get update &> /dev/null
 apt-get install -y ca-certificates golang-go make grep curl &> /dev/null
 printf "[${GREEN}${bold}完成${NC}${normal}] 安裝依賴完成\n"
