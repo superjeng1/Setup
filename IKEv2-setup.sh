@@ -63,7 +63,7 @@ fi
 if [[ $auth_key = "fooAPIKey" ]]; then
   exit_badly "Varible 'auth_key' is still a default value. Please enter it by editing this script!!"
 fi
-if [[ $zone_identifier="fooZoneId" ]]; then
+if [[ $zone_identifier = "fooZoneId" ]]; then
   exit_badly "Varible 'zone_identifier' is still a default value. Please enter it by editing this script!!"
 fi
 
