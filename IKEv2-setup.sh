@@ -285,7 +285,7 @@ cat <<EOF > ${cloudflareSecrets}
 dns_cloudflare_email = ${auth_email}
 dns_cloudflare_api_key = ${auth_key}
 EOF
-chmod 700 ${cloudflareSecrets}
+chmod 600 ${cloudflareSecrets}
 
 mkdir -p /etc/letsencrypt
 
@@ -603,7 +603,7 @@ cat << EOF > vpn-ios-or-mac.mobileconfig
     </dict>
   </array>
   <key>PayloadDisplayName</key>
-  <string>IKEv2 VPN configuration (${VPNHOST})</string>
+  <string>IKEv2 VPN Configuration (${VPNHOST})</string>
   <key>PayloadIdentifier</key>
   <string>${VPNHOST_R}.$(uuidgen)</string>
   <key>PayloadRemovalDisallowed</key>
