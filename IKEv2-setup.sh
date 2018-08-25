@@ -49,7 +49,7 @@ echo
 [[ $(id -u) -eq 0 ]] || exit_badly "Please re-run as root (e.g. sudo ./path/to/this/script)"
 
 echo
-echo "=== Checking for varibles ==="
+echo "--- Checking for varibles ---"
 echo
 for varibleName in $allVaribles
 do
@@ -66,6 +66,13 @@ fi
 if [[ $zone_identifier = "fooZoneId" ]]; then
   exit_badly "Varible 'zone_identifier' is still a default value. Please enter it by editing this script!!"
 fi
+
+echo
+echo "All Varibles are Setup correctly."
+
+echo
+echo "--- Continuing on BBR installation ---"
+echo
 
 # Pick up and continue with BBR installation
 if [[ $(lsmod |grep 'bbr') ]]; then
@@ -123,6 +130,134 @@ echo strongswan-starter strongswan/runlevel_changes seen true | debconf-set-sele
 apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make
 apt-get install certbot -t stretch-backports -y
 pip3 install certbot-dns-cloudflare
+
+echo
+echo "--- Configuring timezone ---"
+echo
+date
+ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime
+dpkg-reconfigure -f noninteractive tzdata
+
+
+echo
+echo "--- Configuring timedatectl ---"
+echo
+timedatectl set-ntp true
+cat <<'EOF' >> /etc/systemd/timesyncd.conf
+NTP=time1.google.com time2.google.com time3.google.com time4.google.com
+FallbackNTP=time1.google.com time2.google.com time3.google.com time4.google.com
+EOF
+
+
+echo
+echo "--- Configuring CloudFlare DDNS ---"
+echo
+
+touch /var/log/cfupdater.log
+cat <<EOF > /usr/bin/cfupdater-v4
+#!/bin/bash
+
+# Forked by benkulbertis/cloudflare-update-record.sh
+# CHANGE THESE
+auth_email="${auth_email}"            # The email used to login 'https://dash.cloudflare.com'
+auth_key="${auth_key}"   # Top right corner, "My profile" > "Global API Key"
+zone_identifier="${zone_identifier}" # Can be found in the "Overview" tab of your domain
+record_name="${record_name}"                     # Which record you want to be synced
+EOF
+
+cat <<'EOF' >> /usr/bin/cfupdater-v4
+# DO NOT CHANGE LINES BELOW
+ip=$(curl -s https://ipv4.icanhazip.com/)
+
+# SCRIPT START
+echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
+echo "[Cloudflare DDNS] Check Initiated" >> /var/log/cfupdater.log
+echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
+
+# Seek for the record
+record=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records?name=$record_name" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json")
+
+# Can't do anything without the record
+if [[ $record == *"\"count\":0"* ]]; then
+  >&2 echo -e "[Cloudflare DDNS] Record does not exist, perhaps create one first?"
+  exit 1
+fi
+
+# Set existing IP address from the fetched record
+old_ip=$(echo "$record" | grep -Po '(?<="content":")[^"]*' | head -1)
+
+# Compare if they're the same
+if [ $ip == $old_ip ]; then
+  echo "[Cloudflare DDNS] IP has not changed." >> /var/log/cfupdater.log
+  exit 0
+fi
+
+# Set the record identifier from result
+record_identifier=$(echo "$record" | grep -Po '(?<="id":")[^"]*' | head -1)
+
+# The execution of update
+update=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records/$record_identifier" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json" --data "{\"id\":\"$zone_identifier\",\"type\":\"A\",\"proxied\":false,\"name\":\"$record_name\",\"content\":\"$ip\"}")
+
+# The moment of truth
+case "$update" in
+*"\"success\":false"*)
+  >&2 echo -e "[Cloudflare DDNS] Update failed for $record_identifier. DUMPING RESULTS:\n$update" >> /var/log/cfupdater.log
+  exit 1;;
+*)
+  echo "[Cloudflare DDNS] IPv4 context '$ip' has been synced to Cloudflare." >> /var/log/cfupdater.log;;
+esac
+EOF
+
+chmod 700 /usr/bin/cfupdater-v4
+
+cat <<'EOF' > /etc/systemd/system/cfupdate.service
+[Unit]
+Description=Cloudflare DDNS service
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/cfupdater-v4
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+chmod 644 /etc/systemd/system/cfupdate.service
+
+cat <<'EOF' > /etc/systemd/system/cfupdate.timer
+[Unit]
+Description=Run cfupdate.service every three seconds
+
+[Timer]
+OnCalendar=*:*:0/3
+AccuracySec=1ms
+
+[Install]
+WantedBy=timers.target
+EOF
+chmod 644 /etc/systemd/system/cfupdate.timer
+
+mkdir ~/systemd-timesyncd-wait/
+cd ~/systemd-timesyncd-wait/
+wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/Makefile
+wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.go
+wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.service
+wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.socket
+wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wrap.go
+wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd.service.d-wait.conf
+make
+make install
+cd ~/
+
+cat <<'EOF' >> /lib/systemd/system/timers.target
+Requires=systemd-timesyncd-wait.service
+EOF
+
+#systemctl daemon-reload
+systemctl enable cfupdate.timer
+#systemctl start cfupdate.timer
+systemctl status cfupdate.timer
 
 echo
 echo "--- Configuration: VPN settings ---"
@@ -308,136 +443,6 @@ grep -Fq 'Setup by setup.sh' /etc/apparmor.d/local/usr.lib.ipsec.charon || echo 
 " >> /etc/apparmor.d/local/usr.lib.ipsec.charon
 
 aa-status --enabled && invoke-rc.d apparmor reload
-
-
-echo
-echo "--- Configuring timezone ---"
-echo
-date
-ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime
-dpkg-reconfigure -f noninteractive tzdata
-
-
-echo
-echo "--- Configuring timedatectl ---"
-echo
-timedatectl set-ntp true
-cat <<'EOF' >> /etc/systemd/timesyncd.conf
-NTP=time1.google.com time2.google.com time3.google.com time4.google.com
-FallbackNTP=time1.google.com time2.google.com time3.google.com time4.google.com
-EOF
-
-
-echo
-echo "--- Configuring CloudFlare DDNS ---"
-echo
-
-touch /var/log/cfupdater.log
-cat <<EOF > /usr/bin/cfupdater-v4
-#!/bin/bash
-
-# Forked by benkulbertis/cloudflare-update-record.sh
-# CHANGE THESE
-auth_email="${auth_email}"            # The email used to login 'https://dash.cloudflare.com'
-auth_key="${auth_key}"   # Top right corner, "My profile" > "Global API Key"
-zone_identifier="${zone_identifier}" # Can be found in the "Overview" tab of your domain
-record_name="${record_name}"                     # Which record you want to be synced
-EOF
-
-cat <<'EOF' >> /usr/bin/cfupdater-v4
-# DO NOT CHANGE LINES BELOW
-ip=$(curl -s https://ipv4.icanhazip.com/)
-
-# SCRIPT START
-echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
-echo "[Cloudflare DDNS] Check Initiated" >> /var/log/cfupdater.log
-echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
-
-# Seek for the record
-record=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records?name=$record_name" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json")
-
-# Can't do anything without the record
-if [[ $record == *"\"count\":0"* ]]; then
-  >&2 echo -e "[Cloudflare DDNS] Record does not exist, perhaps create one first?"
-  exit 1
-fi
-
-# Set existing IP address from the fetched record
-old_ip=$(echo "$record" | grep -Po '(?<="content":")[^"]*' | head -1)
-
-# Compare if they're the same
-if [ $ip == $old_ip ]; then
-  echo "[Cloudflare DDNS] IP has not changed." >> /var/log/cfupdater.log
-  exit 0
-fi
-
-# Set the record identifier from result
-record_identifier=$(echo "$record" | grep -Po '(?<="id":")[^"]*' | head -1)
-
-# The execution of update
-update=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records/$record_identifier" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json" --data "{\"id\":\"$zone_identifier\",\"type\":\"A\",\"proxied\":false,\"name\":\"$record_name\",\"content\":\"$ip\"}")
-
-# The moment of truth
-case "$update" in
-*"\"success\":false"*)
-  >&2 echo -e "[Cloudflare DDNS] Update failed for $record_identifier. DUMPING RESULTS:\n$update" >> /var/log/cfupdater.log
-  exit 1;;
-*)
-  echo "[Cloudflare DDNS] IPv4 context '$ip' has been synced to Cloudflare." >> /var/log/cfupdater.log;;
-esac
-EOF
-
-chmod 700 /usr/bin/cfupdater-v4
-
-cat <<'EOF' > /etc/systemd/system/cfupdate.service
-[Unit]
-Description=Cloudflare DDNS service
-After=network.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/cfupdater-v4
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-chmod 644 /etc/systemd/system/cfupdate.service
-
-cat <<'EOF' > /etc/systemd/system/cfupdate.timer
-[Unit]
-Description=Run cfupdate.service every three seconds
-
-[Timer]
-OnCalendar=*:*:0/3
-AccuracySec=1ms
-
-[Install]
-WantedBy=timers.target
-EOF
-chmod 644 /etc/systemd/system/cfupdate.timer
-
-mkdir ~/systemd-timesyncd-wait/
-cd ~/systemd-timesyncd-wait/
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/Makefile
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.go
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.service
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wait.socket
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd-wrap.go
-wget https://github.com/assisi/systemd-timesyncd-wait/raw/master/systemd-timesyncd.service.d-wait.conf
-make
-make install
-cd ~/
-
-cat <<'EOF' >> /lib/systemd/system/timers.target
-Requires=systemd-timesyncd-wait.service
-EOF
-
-#systemctl daemon-reload
-systemctl enable cfupdate.timer
-#systemctl start cfupdate.timer
-systemctl status cfupdate.timer
-
 
 echo
 echo "--- Configuring VPN ---"
