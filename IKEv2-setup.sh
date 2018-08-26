@@ -750,6 +750,7 @@ echo
 echo "Connection instructions can be found in your home directory"
 
 read -s -p "Setup is almost finished. Press [Return] to Install BBR now and Reboot. Ctrl-C to finish setup without installing BBR..." DUMMYVAR
+echo
 read -n 1 -s -r -p "Please RE-RUN this script after reboot. It will automaticly finish the installation. Press any key to continue..."
 touch ~/raninstallbbr
 wget -qO 'BBR.sh' 'https://moeclub.org/attachment/LinuxShell/BBR.sh'
