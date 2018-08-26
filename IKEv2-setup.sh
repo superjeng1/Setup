@@ -286,6 +286,7 @@ if [[ "$IP" != "$VPNHOSTIP" ]]; then
 fi
 
 echo
+echo
 echo "--- Configuring firewall ---"
 echo
 
