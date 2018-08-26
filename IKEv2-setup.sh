@@ -37,6 +37,9 @@ zone_identifier="fooZoneId"    # << Change This
 record_name=${VPNHOST}         # << Linked with VPNHOST
 # Which record you want to be synced
 
+iosProfileName="IKEv2 VPN Configuration (${VPNHOST})"
+iosVPNName="${VPNHOST}"
+
 function exit_badly {
   echo $1
   exit 1
@@ -602,13 +605,13 @@ cat << EOF > vpn-ios-or-mac.mobileconfig
         <integer>0</integer>
       </dict>
       <key>UserDefinedName</key>
-      <string>${VPNHOST}</string>
+      <string>${iosVPNName}</string>
       <key>VPNType</key>
       <string>IKEv2</string>
     </dict>
   </array>
   <key>PayloadDisplayName</key>
-  <string>IKEv2 VPN Configuration (${VPNHOST})</string>
+  <string>${iosProfileName}</string>
   <key>PayloadIdentifier</key>
   <string>${VPNHOST_R}.$(uuidgen)</string>
   <key>PayloadRemovalDisallowed</key>
