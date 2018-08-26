@@ -97,7 +97,6 @@ export DEBIAN_FRONTEND=noninteractive
 
 # AppArmor
 if ! [ -x "$(command -v aa-status)" ]; then
-  echo
   echo "AppArmor Setup"
   echo
   echo "Please RE-Run this script without setting up AppArmor after rebooting to continue with the rest of the setup."
