@@ -16,14 +16,8 @@ cloudflareSecrets="~/.secrets/certbot/cloudflare.ini" # << Maybe Change This
 cloudflareSecretsPath="~/.secrets/certbot/"           # << Maybe Change This
 
 VPNIPPOOL="10.10.10.0/24" # << Maybe Change This
-while true; do
 VPNPASSWORD=" "           # << Change This
-echo
-VPNPASSWORD2=" "          # << Change This
-echo
-[ "$VPNPASSWORD" = "$VPNPASSWORD2" ] && break
-echo "Passwords didn't match -- please edit VPNPASSWORD and VPNPASSWORD2 in this script so they match."
-done
+VPNPASSWORD2=" "          # << Change This and match "VPNPASSWORD"
 
 auth_email="foo@example.org"   # << Change This
 # The email used to login 'https://dash.cloudflare.com'
@@ -70,16 +64,19 @@ if [[ $zone_identifier = "fooZoneId" ]]; then
   exit_badly "Varible 'zone_identifier' is still a default value. Please enter it by editing this script!!"
 fi
 
-echo
-echo "All Varibles are Setup correctly."
+if [[ "$VPNPASSWORD" != "$VPNPASSWORD2" ]]; then
+  exit_badly "Passwords didn't match -- please edit VPNPASSWORD and VPNPASSWORD2 in this script so they match."
+fi
 
 echo
-echo "--- Continuing on BBR installation ---"
-echo
+echo "All Varibles are Setup correctly."
 
 # Pick up and continue with BBR installation
 if [[ $(lsmod |grep 'bbr') ]]; then
   if [[ ! $(lsmod |grep 'bbr_powered') ]]; then
+    echo
+    echo "--- Continuing on BBR installation ---"
+    echo
     wget -qO 'BBR_POWERED.sh' 'https://moeclub.org/attachment/LinuxShell/BBR_POWERED.sh'
     bash BBR_POWERED.sh
     rm ~/raninstallbbr
