@@ -230,10 +230,10 @@ chmod 644 /etc/systemd/system/cfupdate.service
 
 cat <<'EOF' > /etc/systemd/system/cfupdate.timer
 [Unit]
-Description=Run cfupdate.service every three seconds
+Description=Run cfupdate.service every ten seconds
 
 [Timer]
-OnCalendar=*:*:0/3
+OnCalendar=*:*:0/10
 AccuracySec=1ms
 
 [Install]
