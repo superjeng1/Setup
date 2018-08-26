@@ -70,6 +70,7 @@ fi
 
 echo
 echo "All Varibles are Setup correctly."
+echo
 
 # Pick up and continue with BBR installation
 if [[ $(lsmod |grep 'bbr') ]]; then
