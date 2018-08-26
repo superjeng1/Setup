@@ -257,8 +257,11 @@ EOF
 
 #systemctl daemon-reload
 systemctl enable cfupdate.timer
-#systemctl start cfupdate.timer
+systemctl start cfupdate.timer
 systemctl status cfupdate.timer
+
+echo "Waiting for 11 sec..."
+sleep 11
 
 echo
 echo "--- Configuration: VPN settings ---"
