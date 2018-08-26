@@ -82,6 +82,7 @@ if [[ $(lsmod |grep 'bbr') ]]; then
     bash BBR_POWERED.sh
     rm ~/raninstallbbr
     read -s -p "All setup is completed, press [Return] to reboot, or Ctrl-C to exit..."
+    echo
     reboot
     exit 0
   else
