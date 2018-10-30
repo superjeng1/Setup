@@ -2,7 +2,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
-allVaribles="timezone email VPNHOST VPNUSERNAME cloudflareSecrets cloudflareSecretsPath VPNIPPOOL VPNPASSWORD VPNPASSWORD2 auth_email auth_key zone_identifier record_name"
+allVaribles="timezone email VPNHOST VPNUSERNAME cloudflareSecrets cloudflareSecretsPath VPNIPPOOL VPNPASSWORD VPNPASSWORD2 auth_email auth_key zone_identifier record_name RSS_BOT_KEY"
 
 timezone="Asia/Taipei"    # << Change This
 
@@ -33,6 +33,8 @@ record_name=${VPNHOST}         # << Linked with VPNHOST
 
 iosProfileName="IKEv2 VPN Configuration (${VPNHOST})"
 iosVPNName="${VPNHOST}"
+
+RSS_BOT_KEY=" "
 
 function exit_badly {
   echo $1
@@ -132,6 +134,10 @@ apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libchar
 apt-get install certbot -t stretch-backports -y
 pip3 install certbot-dns-cloudflare
 
+echo 'screen -R
+logout
+' >> /etc/profile
+
 echo
 echo "--- Configuring timezone ---"
 echo
@@ -147,6 +153,24 @@ timedatectl set-ntp true
 cat <<'EOF' >> /etc/systemd/timesyncd.conf
 NTP=time1.google.com time2.google.com time3.google.com time4.google.com
 FallbackNTP=time1.google.com time2.google.com time3.google.com time4.google.com
+EOF
+
+
+cat << EOF > /etc/systemd/system/rssbot.service
+[Unit]
+Description=RSSBot service
+After=network.target, multi-user.target
+StartLimitAction=reboot
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/root/rssbot/target/release/rssbot /root/rssbot/target/release/data.json ${RSS_BOT_KEY}
+
+[Install]
+WantedBy=multi-user.target
+
 EOF
 
 
@@ -171,16 +195,16 @@ cat <<'EOF' >> /usr/bin/cfupdater-v4
 ip=$(curl -s https://ipv4.icanhazip.com/)
 
 # SCRIPT START
-echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
-echo "[Cloudflare DDNS] Check Initiated" >> /var/log/cfupdater.log
-echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
+#echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
+#echo "[Cloudflare DDNS] Check Initiated" >> /var/log/cfupdater.log
+#echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
 
 # Seek for the record
 record=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records?name=$record_name" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json")
 
 # Can't do anything without the record
 if [[ $record == *"\"count\":0"* ]]; then
-  >&2 echo -e "[Cloudflare DDNS] Record does not exist, perhaps create one first?"
+#  >&2 echo -e "[Cloudflare DDNS] Record does not exist, perhaps create one first?"
   exit 1
 fi
 
@@ -189,7 +213,7 @@ old_ip=$(echo "$record" | grep -Po '(?<="content":")[^"]*' | head -1)
 
 # Compare if they're the same
 if [ $ip == $old_ip ]; then
-  echo "[Cloudflare DDNS] IP has not changed." >> /var/log/cfupdater.log
+#  echo "[Cloudflare DDNS] IP has not changed." >> /var/log/cfupdater.log
   exit 0
 fi
 
@@ -202,7 +226,7 @@ update=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zone_identi
 # The moment of truth
 case "$update" in
 *"\"success\":false"*)
-  >&2 echo -e "[Cloudflare DDNS] Update failed for $record_identifier. DUMPING RESULTS:\n$update" >> /var/log/cfupdater.log
+  #>&2 echo -e "[Cloudflare DDNS] Update failed for $record_identifier. DUMPING RESULTS:\n$update" >> /var/log/cfupdater.log
   exit 1;;
 *)
   echo "[Cloudflare DDNS] IPv4 context '$ip' has been synced to Cloudflare." >> /var/log/cfupdater.log;;
