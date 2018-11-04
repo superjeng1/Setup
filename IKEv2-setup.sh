@@ -130,7 +130,7 @@ echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-
 #echo strongswan-starter strongswan/runlevel_changes note | debconf-set-selections # Did not work.
 #echo strongswan-starter strongswan/runlevel_changes seen true | debconf-set-selections # Did not work.
 
-apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make curl screen build-essential zlib1g-dev
+apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make curl screen build-essential zlib1g-dev openssl libssl-dev pkg-config git
 apt-get install certbot -t stretch-backports -y
 pip3 install certbot-dns-cloudflare
 
@@ -159,20 +159,26 @@ EOF
 cat << EOF > /etc/systemd/system/rssbot.service
 [Unit]
 Description=RSSBot service
-After=network.target, multi-user.target
+After=multi-user.target
 StartLimitAction=reboot
 
 [Service]
 Type=simple
 Restart=always
 RestartSec=1
-ExecStart=/root/rssbot/target/release/rssbot /root/rssbot/target/release/data.json ${RSS_BOT_KEY}
+ExecStart=/rssbot/target/release/rssbot /rssbot/target/release/data.json ${RSS_BOT_KEY}
 
 [Install]
 WantedBy=multi-user.target
 
 EOF
 
+git clone https://github.com/iovxw/rssbot.git /rssbot
+curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
+source $HOME/.cargo/env
+cd /rssbot
+cargo build --release
+cd target/release
 
 echo
 echo "--- Configuring CloudFlare DDNS ---"
