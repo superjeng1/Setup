@@ -670,7 +670,8 @@ echo
 echo "Passwords didn't match -- please try again"
 done
 
-apt-get install -y strongswan libstrongswan-standard-plugins libcharon-extra-plugins
+apt-get install -y strongswan libstrongswan-standard-plugins libcharon-extra-plugins resolvconf
+dpkg-reconfigure resolvconf | true
 apt-get install -y libcharon-standard-plugins || true  # 17.04+ only
 
 ln -f -s /etc/ssl/certs/DST_Root_CA_X3.pem /etc/ipsec.d/cacerts/
