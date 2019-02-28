@@ -2,7 +2,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
-allVaribles="timezone email VPNHOST VPNUSERNAME cloudflareSecrets cloudflareSecretsPath VPNIPPOOL VPNPASSWORD VPNPASSWORD2 auth_email auth_key zone_identifier record_name RSS_BOT_KEY"
+allVaribles="timezone email VPNHOST VPNUSERNAME cloudflareSecrets cloudflareSecretsPath VPNIPPOOL VPNPASSWORD VPNPASSWORD2 auth_email auth_key zone_identifier record_name"
 
 timezone="Asia/Taipei"    # << Change This
 
@@ -33,8 +33,6 @@ record_name=${VPNHOST}         # << Linked with VPNHOST
 
 iosProfileName="IKEv2 VPN Configuration (${VPNHOST})"
 iosVPNName="${VPNHOST}"
-
-RSS_BOT_KEY=" "
 
 function exit_badly {
   echo $1
@@ -154,31 +152,6 @@ cat <<'EOF' >> /etc/systemd/timesyncd.conf
 NTP=time1.google.com time2.google.com time3.google.com time4.google.com
 FallbackNTP=time1.google.com time2.google.com time3.google.com time4.google.com
 EOF
-
-
-cat << EOF > /etc/systemd/system/rssbot.service
-[Unit]
-Description=RSSBot service
-After=multi-user.target
-StartLimitAction=reboot
-
-[Service]
-Type=simple
-Restart=always
-RestartSec=1
-ExecStart=/rssbot/target/release/rssbot /rssbot/target/release/data.json ${RSS_BOT_KEY}
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-
-git clone https://github.com/iovxw/rssbot.git /rssbot
-curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
-source $HOME/.cargo/env
-cd /rssbot
-cargo build --release
-cd target/release
 
 echo
 echo "--- Configuring CloudFlare DDNS ---"
