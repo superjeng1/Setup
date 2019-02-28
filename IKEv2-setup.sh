@@ -128,7 +128,7 @@ echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-
 #echo strongswan-starter strongswan/runlevel_changes note | debconf-set-selections # Did not work.
 #echo strongswan-starter strongswan/runlevel_changes seen true | debconf-set-selections # Did not work.
 
-apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make curl screen build-essential zlib1g-dev openssl libssl-dev pkg-config git
+apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make curl screen build-essential zlib1g-dev openssl libssl-dev pkg-config git resolvconf
 apt-get install certbot -t stretch-backports -y
 pip3 install certbot-dns-cloudflare
 
@@ -265,6 +265,15 @@ systemctl start cfupdate.timer
 
 echo "Waiting for 11 sec..."
 sleep 11
+
+echo
+echo "--- Configuration: DNS settings ---"
+echo
+
+cat <<'EOF' >> /etc/network/interfaces
+dns-nameservers 1.1.1.1 1.0.0.1
+EOF
+service resolvconf restart
 
 echo
 echo "--- Configuration: VPN settings ---"
