@@ -132,7 +132,7 @@ apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libchar
 apt-get install certbot -t stretch-backports -y
 pip3 install certbot-dns-cloudflare
 
-echo 'screen -R
+echo 'screen -d -RR
 logout
 ' >> /etc/profile
 
