@@ -129,8 +129,8 @@ echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-
 #echo strongswan-starter strongswan/runlevel_changes seen true | debconf-set-selections # Did not work.
 
 apt-get install -yq strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-extra-plugins moreutils iptables-persistent dnsutils uuid-runtime ca-certificates apparmor apparmor-utils libssl1.0.0 python3-pip golang-go make curl screen build-essential zlib1g-dev openssl libssl-dev pkg-config git resolvconf
-apt-get install certbot -t stretch-backports -y
-pip3 install certbot-dns-cloudflare
+#apt-get install certbot -t stretch-backports -y
+pip3 install certbot certbot-dns-cloudflare
 
 echo 'screen -d -RR -U
 logout
